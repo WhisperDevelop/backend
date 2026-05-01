@@ -31,7 +31,7 @@ Route::prefix('v1')->group(function () {
     */
 
     // 新規ユーザー登録
-    Route::post('/register', [RegistrationController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register']);
 
     // ログイン
     Route::post('/login', [AuthController::class, 'login']);
