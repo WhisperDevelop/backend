@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WhisperController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\FollowerController;
-use App\Http\Controllers\Api\V1\RegistrationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +30,7 @@ Route::prefix('v1')->group(function () {
     */
 
     // 新規ユーザー登録
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register', [UserController::class, 'register']);
 
     // ログイン
     Route::post('/login', [AuthController::class, 'login']);
