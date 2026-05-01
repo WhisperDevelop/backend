@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WhisperController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\FollowerController;
+use App\Http\Controllers\Api\V1\RegistrationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,15 +23,12 @@ Route::prefix('v1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | 認証API
+    | 認証・登録 API (非ログイン時)
     |--------------------------------------------------------------------------
-    |
-    | ログイン、新規登録、ログアウトなどの認証処理。
-    |
     */
 
     // 新規ユーザー登録
-    Route::post('/register', [UserController::class, 'register']);
+    Route::post('/users/register', [UserController::class, 'register']);
 
     // ログイン
     Route::post('/login', [AuthController::class, 'login']);
@@ -46,9 +44,6 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
 
-        // ログイン中のユーザー情報を取得
-        Route::get('/user', [AuthController::class, 'user']);
-
         // ログアウト
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -58,14 +53,14 @@ Route::prefix('v1')->group(function () {
         |--------------------------------------------------------------------------
         */
 
-        // ユーザー一覧を取得
-        Route::get('/users', [UserController::class, 'index']);
-
-        // 指定ユーザーの詳細を取得
-        Route::get('/users/{id}', [UserController::class, 'show']);
+        // ログイン中のユーザー情報を取得
+        Route::get('/user', [UserController::class, 'show']);
 
         // ログイン中ユーザーのプロフィールを更新
-        Route::put('/users/profile', [UserController::class, 'updateProfile']);
+        Route::post('/users/profile/{id}', [UserController::class, 'update']);
+
+        // ログインユーザーを削除
+        Route::post('/users/delete/{id}', [UserController::class, 'destroy']);
 
         /*
         |--------------------------------------------------------------------------
@@ -73,26 +68,17 @@ Route::prefix('v1')->group(function () {
         |--------------------------------------------------------------------------
         */
 
-        // ささやき一覧を取得
+        // タイムライン取得
         Route::get('/whispers', [WhisperController::class, 'index']);
 
         // 新しいささやきを投稿
         Route::post('/whispers', [WhisperController::class, 'store']);
 
-        // 指定したささやきの詳細を取得
-        Route::get('/whispers/{id}', [WhisperController::class, 'show']);
-
-        // 自分のささやきを更新
-        Route::put('/whispers/{id}', [WhisperController::class, 'update']);
+        // 指定ユーザーのささやき一覧取得
+        Route::get('/user/whispers/{id}', [WhisperController::class, 'show']);
 
         // 自分のささやきを削除
-        Route::delete('/whispers/{id}', [WhisperController::class, 'destroy']);
-
-        // ささやきにいいねする
-        Route::post('/whispers/{id}/like', [WhisperController::class, 'like']);
-
-        // ささやきのいいねを解除する
-        Route::delete('/whispers/{id}/like', [WhisperController::class, 'unlike']);
+        Route::post('/whispers/{id}', [WhisperController::class, 'destroy']);
 
         /*
         |--------------------------------------------------------------------------
@@ -100,29 +86,37 @@ Route::prefix('v1')->group(function () {
         |--------------------------------------------------------------------------
         */
 
-        // キーワードでユーザーやささやきを検索
-        Route::get('/search', [SearchController::class, 'search']);
+        // ユーザー名検索
+        Route::get('/search/users/{keyword}', [SearchController::class, 'usernameSearch']);
+
+        // ささやき本文検索
+        Route::get('/search/whispers/{keyword}', [SearchController::class, 'whisperSearch']);
 
         /*
         |--------------------------------------------------------------------------
         | フォローAPI
         |--------------------------------------------------------------------------
-        |
-        | 設計書に合わせて FollwerController の名前を使用。
-        | 後で修正する場合は FollowerController に変更する。
-        |
         */
 
-        // 指定ユーザーをフォローする
-        Route::post('/users/{id}/follow', [FollowerController::class, 'follow']);
-
-        // 指定ユーザーのフォローを解除する
-        Route::delete('/users/{id}/follow', [FollowerController::class, 'unfollow']);
-
         // 自分がフォローしているユーザー一覧を取得
-        Route::get('/follows', [FollowerController::class, 'follows']);
+        Route::get('/following', [FollowerController::class, 'following']);
 
         // 自分をフォローしているユーザー一覧を取得
         Route::get('/followers', [FollowerController::class, 'followers']);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 登録API (フォロー・いいね)
+        |--------------------------------------------------------------------------
+        |
+        | shiyousho に基づき RegistrationController を使用。
+        |
+        */
+
+        // フォロー登録・解除 (Toggle)
+        Route::post('/followcheck', [RegistrationController::class, 'followRegister']);
+
+        // いいね登録・解除 (Toggle)
+        Route::post('/likecheck', [RegistrationController::class, 'likeRegister']);
     });
 });
