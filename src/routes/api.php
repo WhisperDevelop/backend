@@ -121,9 +121,9 @@ Route::prefix('v1')->group(function () {
         Route::delete('/users/{id}/follow', [FollowerController::class, 'unfollow']);
 
         // 自分がフォローしているユーザー一覧を取得
-        Route::get('/follows', [FollwerController::class, 'follows']);
+        Route::get('/follows', [FollowerController::class, 'follows']);
 
         // 自分をフォローしているユーザー一覧を取得
-        Route::get('/followers', [FollwerController::class, 'followers']);
+        Route::get('/followers', [FollowerController::class, 'followers']);
     });
 });
