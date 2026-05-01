@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
  * - GET /api/v1/following
  * - GET /api/v1/followers
  */
-class FollwerController extends Controller
+class FollowerController extends Controller
 {
     /**
      * フォロー一覧取得処理。
