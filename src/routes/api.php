@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WhisperController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\FollowerController;
-use App\Http\Controllers\Api\V1\RegistrationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +30,7 @@ Route::prefix('v1')->group(function () {
     */
 
     // 新規ユーザー登録
-    Route::post('/register', [RegistrationController::class, 'register']);
+    Route::post('/register', [UserController::class, 'register']);
 
     // ログイン
     Route::post('/login', [AuthController::class, 'login']);
@@ -121,9 +120,9 @@ Route::prefix('v1')->group(function () {
         Route::delete('/users/{id}/follow', [FollowerController::class, 'unfollow']);
 
         // 自分がフォローしているユーザー一覧を取得
-        Route::get('/follows', [FollwerController::class, 'follows']);
+        Route::get('/follows', [FollowerController::class, 'follows']);
 
         // 自分をフォローしているユーザー一覧を取得
-        Route::get('/followers', [FollwerController::class, 'followers']);
+        Route::get('/followers', [FollowerController::class, 'followers']);
     });
 });
