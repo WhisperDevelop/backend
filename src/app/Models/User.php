@@ -42,4 +42,34 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id');
+    }
+
+    public function whispers()
+    {
+        return $this->hasMany(Whisper::class, 'user_id');
+    }
+
+    public function follows()
+    {
+        return $this->belongsToMany(User::class, 'follow_users', 'user_id', 'follow_user_id');
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follow_users', 'follow_user_id', 'user_id');
+    }
+
+    public function isFollowing($userId)
+    {
+        return $this->follows()->where('follow_user_id', $userId)->exists();
+    }
+
+    public function likedWhispers()
+    {
+        return $this->belongsToMany(Whisper::class, 'likes', 'user_id', 'whisper_id');
+    }
 }
