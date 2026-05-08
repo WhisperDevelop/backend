@@ -57,13 +57,13 @@ class WhisperController extends Controller
     {
         // 入力値を検証する。
         $validated = $request->validate([
-            'text' => ['required', 'string', 'max:280'],
+            'content' => ['required', 'string', 'max:280'],
         ]);
 
         // ささやきを作成する。
         $whisper = Whisper::create([
             'user_id' => $request->user()->id,
-            'text' => $validated['text'],
+            'content' => $validated['content'],
         ]);
 
         return response()->json([
