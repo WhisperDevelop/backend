@@ -41,7 +41,7 @@ class SearchController extends Controller
     {
         $whispers = Whisper::with(['user.profile'])
             ->withCount('likedBy as likes_count')
-            ->where('text', 'like', '%' . $keyword . '%')
+            ->where('content', 'like', '%' . $keyword . '%')
             ->latest()
             ->get();
 
