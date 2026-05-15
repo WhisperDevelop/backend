@@ -67,37 +67,4 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function register(Request $request)
-    {
-        // ユーザー登録処理の実装
-        // 登録処理の実装
-        // バリデーション
-        $validator = Validator::make($request->all(), [
-            'name'     => 'required',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'バリデーションエラー',
-                'errors'  => $validator->errors()
-            ], 422);
-        }
-
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // トークン発行（モバイルアプリ用）
-        $token = $user->createToken('mobile')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-            'user'  => $user
-        ], 201);
-    }
 }
