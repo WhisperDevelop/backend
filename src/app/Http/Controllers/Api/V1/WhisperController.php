@@ -57,13 +57,13 @@ class WhisperController extends Controller
     {
         // 入力値を検証する。
         $validated = $request->validate([
-            'text' => ['required', 'string', 'max:280'],
+            'content' => ['required', 'string', 'max:280'],
         ]);
 
         // ささやきを作成する。
         $whisper = Whisper::create([
             'user_id' => $request->user()->id,
-            'text' => $validated['text'],
+            'content' => $validated['content'],
         ]);
 
         return response()->json([
@@ -85,7 +85,7 @@ class WhisperController extends Controller
         // 指定ユーザーのささやきを新しい順で取得する。
         $whispers = Whisper::with(['user.profile'])
             ->withCount('likedBy as likes_count')
-            ->where('user_id', $id)
+            ->where('whisper_id', $id)
             ->latest()
             ->get();
 
