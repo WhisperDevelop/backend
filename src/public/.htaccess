@@ -4,9 +4,7 @@
     </IfModule>
 
     RewriteEngine On
-
-    #2026/04/08 森修正clickサーバ用追加
-    #RewriteBase /ecc/ここにチーム名/
+    RewriteBase /ecc/whisper26_b/
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
