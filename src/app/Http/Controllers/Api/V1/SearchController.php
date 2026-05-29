@@ -28,7 +28,8 @@ class SearchController extends Controller
             ->get();
 
         return response()->json([
-            'user_line' => $users,
+            'users' => $users,      // ✅ Đổi từ 'user_line' → 'users'
+            'whispers' => []        // ✅ Thêm field whispers rỗng để Android không crash
         ]);
     }
 
@@ -46,7 +47,8 @@ class SearchController extends Controller
             ->get();
 
         return response()->json([
-            'whisper' => $whispers,
+            'users' => [],          // ✅ Thêm field users rỗng
+            'whispers' => $whispers // ✅ Đổi từ 'whisper' → 'whispers' (số nhiều)
         ]);
     }
 }
