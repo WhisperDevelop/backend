@@ -83,6 +83,9 @@ Route::prefix('v1')->group(function () {
         // 指定ユーザーのささやき一覧取得
         Route::get('/user/whispers/{id}', [WhisperController::class, 'show']);
 
+        // 指定ユーザーがいいねしたささやき一覧取得
+        Route::get('/user/liked/{id}', [WhisperController::class, 'liked']);
+
         // 自分のささやきを削除
         Route::post('/whispers/{id}', [WhisperController::class, 'destroy']);
 

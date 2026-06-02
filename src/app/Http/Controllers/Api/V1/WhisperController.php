@@ -101,6 +101,24 @@ class WhisperController extends Controller
      *
      * 投稿者本人だけが削除できる。
      */
+    /**
+     * 指定ユーザーがいいねしたささやき一覧取得処理。
+     */
+    public function liked($id)
+    {
+        $user = User::findOrFail($id);
+
+        $whispers = $user->likedWhispers()
+            ->with(['user.profile'])
+            ->withCount('likedBy as likes_count')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'whisper' => $whispers,
+        ]);
+    }
+
     public function destroy(Request $request, $id)
     {
         $whisper = Whisper::findOrFail($id);
