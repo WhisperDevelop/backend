@@ -56,6 +56,12 @@ Route::prefix('v1')->group(function () {
         // ログイン中のユーザー情報を取得
         Route::get('/user', [UserController::class, 'show']);
 
+        // 全ユーザー一覧を取得
+        Route::get('/users', [UserController::class, 'index']);
+
+        // 指定ユーザー情報を取得
+        Route::get('/users/{id}', [UserController::class, 'getById']);
+
         // ログイン中ユーザーのプロフィールを更新
         Route::post('/users/profile/{id}', [UserController::class, 'update']);
 

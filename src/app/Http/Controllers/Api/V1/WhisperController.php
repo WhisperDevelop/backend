@@ -26,20 +26,9 @@ class WhisperController extends Controller
      */
     public function index(Request $request)
     {
-        $loginUser = $request->user();
-
-        // フォローしているユーザーIDを取得する。
-        $followingIds = $loginUser->follows()
-            ->pluck('users.id')
-            ->toArray();
-
-        // 自分の投稿もタイムラインに含める。
-        $targetUserIds = array_merge([$loginUser->id], $followingIds);
-
-        // 対象ユーザーのささやきを取得する。
+        // 全ユーザーのささやきを新しい順で返す。
         $whispers = Whisper::with(['user.profile'])
             ->withCount('likedBy as likes_count')
-            ->whereIn('user_id', $targetUserIds)
             ->latest()
             ->get();
 
@@ -77,10 +66,14 @@ class WhisperController extends Controller
      *
      * 指定されたユーザーの情報と投稿一覧を返す。
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        // ユーザー情報をプロフィール付きで取得する。
-        $user = User::with('profile')->findOrFail($id);
+        $loginUser = $request->user();
+
+        // ユーザー情報をフォロー数付きで取得する。
+        $user = User::with('profile')
+            ->withCount(['follows', 'followers'])
+            ->findOrFail($id);
 
         // 指定ユーザーのささやきを新しい順で取得する。
         $whispers = Whisper::with(['user.profile'])
@@ -90,7 +83,15 @@ class WhisperController extends Controller
             ->get();
 
         return response()->json([
-            'user_line' => $user,
+            'user_line' => [
+                'id'               => $user->id,
+                'name'             => $user->name,
+                'email'            => $user->email,
+                'profile'          => $user->profile,
+                'follows_count'    => $user->follows_count,
+                'followers_count'  => $user->followers_count,
+                'is_following'     => $loginUser->isFollowing($user->id),
+            ],
             'whisper' => $whispers,
         ]);
     }

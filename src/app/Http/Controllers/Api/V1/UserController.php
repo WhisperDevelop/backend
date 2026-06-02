@@ -27,6 +27,49 @@ class UserController extends Controller
      * usersテーブルとuser_profilesテーブルを同時に作成し、
      * 登録後にSanctumのAPIトークンを返す。
      */
+    /**
+     * 全ユーザー一覧取得処理。
+     */
+    public function index()
+    {
+        $users = User::with('profile')
+            ->withCount(['follows', 'followers'])
+            ->get()
+            ->map(fn($u) => [
+                'id'              => $u->id,
+                'name'            => $u->name,
+                'email'           => $u->email,
+                'profile'         => $u->profile,
+                'follows_count'   => $u->follows_count,
+                'followers_count' => $u->followers_count,
+                'is_following'    => false,
+            ]);
+
+        return response()->json(['users' => $users]);
+    }
+
+    /**
+     * 指定ユーザー情報取得処理。
+     */
+    public function getById(Request $request, $id)
+    {
+        $loginUser = $request->user();
+
+        $user = User::with('profile')
+            ->withCount(['follows', 'followers'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'id'              => $user->id,
+            'name'            => $user->name,
+            'email'           => $user->email,
+            'profile'         => $user->profile,
+            'follows_count'   => $user->follows_count,
+            'followers_count' => $user->followers_count,
+            'is_following'    => $loginUser->isFollowing($user->id),
+        ]);
+    }
+
     public function register(Request $request)
     {
         // 入力値を検証する。
