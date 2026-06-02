@@ -85,7 +85,7 @@ class WhisperController extends Controller
         // 指定ユーザーのささやきを新しい順で取得する。
         $whispers = Whisper::with(['user.profile'])
             ->withCount('likedBy as likes_count')
-            ->where('whisper_id', $id)
+            ->where('user_id', $id)
             ->latest()
             ->get();
 
