@@ -12,6 +12,9 @@ class UserProfile extends Model
     // 主キーの関連付け
     // createメソッドで一括代入できるように配列を作成
 
+    protected $primaryKey = 'user_id';
+    public $incrementing = false;
+
     protected $fillable = [
         'user_id',
         'profile',
