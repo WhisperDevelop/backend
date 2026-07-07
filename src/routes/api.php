@@ -86,6 +86,9 @@ Route::prefix('v1')->group(function () {
         // 指定ユーザーがいいねしたささやき一覧取得
         Route::get('/user/liked/{id}', [WhisperController::class, 'liked']);
 
+        // 自分のささやきを更新（画像の差し替え・削除にも対応）
+        Route::post('/whispers/update/{id}', [WhisperController::class, 'update']);
+
         // 自分のささやきを削除
         Route::post('/whispers/{id}', [WhisperController::class, 'destroy']);
 

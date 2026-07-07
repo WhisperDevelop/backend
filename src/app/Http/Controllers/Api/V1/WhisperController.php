@@ -72,6 +72,65 @@ class WhisperController extends Controller
     }
 
     /**
+     * ささやき更新処理。
+     *
+     * 投稿者本人だけが編集できる。
+     * 画像を差し替え・削除した場合は古い画像ファイルをstorageから削除する。
+     */
+    public function update(Request $request, $id)
+    {
+        $whisper = Whisper::findOrFail($id);
+
+        // 投稿者本人以外は編集できない。
+        if ((int) $whisper->user_id !== (int) $request->user()->id) {
+            return response()->json([
+                'message' => '自分のささやき以外は編集できません。',
+            ], 403);
+        }
+
+        // 入力値を検証する。
+        $validated = $request->validate([
+            'content' => ['nullable', 'string', 'max:280'],
+            'imagefile' => ['nullable', 'file', 'image', 'max:2048'],
+            'remove_image' => ['nullable', 'boolean'],
+        ]);
+
+        $newContent = $validated['content'] ?? '';
+
+        // 更新後の画像の状態を決める。
+        $newImageFileName = $whisper->image_file_name;
+        if ($request->hasFile('imagefile')) {
+            $newImageFileName = $request->file('imagefile')->store('whisper_images', 'public');
+        } elseif ($request->boolean('remove_image')) {
+            $newImageFileName = null;
+        }
+
+        // テキストも画像もない投稿にはできない。
+        if ($newContent === '' && $newImageFileName === null) {
+            return response()->json([
+                'message' => 'ささやく内容または画像を入力してください。',
+            ], 422);
+        }
+
+        // 差し替え・削除された古い画像をstorageから削除する。
+        $oldImageFileName = $whisper->image_file_name;
+        if ($oldImageFileName && $oldImageFileName !== $newImageFileName) {
+            Storage::disk('public')->delete($oldImageFileName);
+        }
+
+        // ささやきを更新する。
+        $whisper->update([
+            'content' => $newContent,
+            'image_file_name' => $newImageFileName,
+        ]);
+
+        return response()->json([
+            'message' => 'ささやきを更新しました。',
+            'whisper' => $whisper,
+        ]);
+    }
+
+    /**
      * 特定ユーザー情報とささやき一覧取得処理。
      *
      * 指定されたユーザーの情報と投稿一覧を返す。
