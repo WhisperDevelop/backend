@@ -12,6 +12,7 @@ class Whisper extends Model
     protected $fillable = [
         'user_id',
         'content',
+        'image_file_name',
     ];
 
     public function user()

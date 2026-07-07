@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Whisper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * ささやきの登録、一覧取得、削除を担当するコントローラー。
@@ -40,19 +41,28 @@ class WhisperController extends Controller
     /**
      * ささやき登録処理。
      *
-     * textを受け取り、ログインユーザーの投稿として保存する。
+     * textまたは画像を受け取り、ログインユーザーの投稿として保存する。
+     * 画像はmultipart/form-dataのimagefileで送信される。
      */
     public function store(Request $request)
     {
-        // 入力値を検証する。
+        // 入力値を検証する。テキストか画像のどちらかは必須。
         $validated = $request->validate([
-            'content' => ['required', 'string', 'max:280'],
+            'content' => ['required_without:imagefile', 'nullable', 'string', 'max:280'],
+            'imagefile' => ['nullable', 'file', 'image', 'max:2048'],
         ]);
+
+        // 画像が送信された場合はstorageに保存する。
+        $imageFileName = null;
+        if ($request->hasFile('imagefile')) {
+            $imageFileName = $request->file('imagefile')->store('whisper_images', 'public');
+        }
 
         // ささやきを作成する。
         $whisper = Whisper::create([
             'user_id' => $request->user()->id,
-            'content' => $validated['content'],
+            'content' => $validated['content'] ?? '',
+            'image_file_name' => $imageFileName,
         ]);
 
         return response()->json([
@@ -128,6 +138,11 @@ class WhisperController extends Controller
             return response()->json([
                 'message' => '自分のささやき以外は削除できません。',
             ], 403);
+        }
+
+        // 添付画像がある場合はstorageから削除する。
+        if ($whisper->image_file_name) {
+            Storage::disk('public')->delete($whisper->image_file_name);
         }
 
         // ささやきを削除する。
